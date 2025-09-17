@@ -14,10 +14,12 @@ This is a Python library (`fastapi-utils`) that provides common utilities for wo
 
 - **Python Version**: 3.12 (specified in `.python-version`)
 - **Package Manager**: uv (modern Python package and project manager)
-- **Dependencies**: Currently no external dependencies defined
+- **Dependencies**: FastAPI and Starlette for web framework functionality
 
 ## Project Structure
 
+- `__init__.py`: Package initialization, exports StaticFilesCache
+- `static_files.py`: Static files utilities including StaticFilesCache class
 - `main.py`: Entry point with basic hello world functionality
 - `pyproject.toml`: Project configuration and metadata
 - `.python-version`: Specifies Python 3.12 requirement
@@ -31,8 +33,21 @@ This is a Python library (`fastapi-utils`) that provides common utilities for wo
 - **Install in development mode**: `uv pip install -e .`
 - **Create virtual environment**: `uv venv`
 
+## Available Utilities
+
+### StaticFilesCache
+
+A FastAPI StaticFiles subclass that adds configurable cache control headers for HTML and text files.
+
+```python
+from fastapi_utils import StaticFilesCache
+
+# Use with custom cache control
+app.mount("/static", StaticFilesCache(directory="static", cachecontrol="max-age=3600"))
+```
+
 ## Notes
 
-- The project is currently a minimal skeleton
-- No testing framework, linting tools, or CI/CD configured yet
-- Future development will likely involve adding FastAPI-specific utilities and dependencies
+- StaticFilesCache automatically adds cache control headers to .html and .txt files
+- Other file types use the default StaticFiles behavior
+- Cache control header is configurable via the `cachecontrol` parameter

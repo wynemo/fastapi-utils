@@ -1,7 +1,10 @@
 [project]
 name = "fastapi-utils"
 version = "0.1.0"
-description = "Add your description here"
+description = "Common utilities for FastAPI applications"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi>=0.100.0",
+    "starlette>=0.27.0"
+]
