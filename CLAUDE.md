@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 使用语言
+
+使用中文
+
 ## Project Overview
 
 This is a Python library (`fastapi-utils`) that provides common utilities for working with FastAPI applications. The project is in early development stage with minimal structure currently in place.
