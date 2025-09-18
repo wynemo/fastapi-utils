@@ -76,6 +76,16 @@ app.mount("/", StaticFilesCache(directory=front_folder), name="static")
 
 这样配置后，HTML文件将不会被浏览器缓存，确保用户总是获取最新版本的前端应用。
 
+## 构建
+
+uv build
+
+## 发布
+
+uv publish
+
+输入__token__作为用户名 然后输入pypi的token
+
 ## License
 
 MIT
