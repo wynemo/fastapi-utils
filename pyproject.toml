@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fastapi-toolbox"
-version = "0.2.0"
+version = "0.3.0"
 description = "Common utilities for FastAPI applications"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -33,4 +33,4 @@ Issues = "https://github.com/wynemo/fastapi-utils/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]
-exclude = ["CLAUDE.md", ".python-version", ".gitignore", "pyproject.toml"]
+exclude = ["CLAUDE.md", ".python-version", ".gitignore", "pyproject.toml", "README.md"]
