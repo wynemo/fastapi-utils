@@ -33,4 +33,4 @@ Issues = "https://github.com/wynemo/fastapi-utils/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]
-exclude = ["main.py"]
+exclude = ["CLAUDE.md", ".python-version", ".gitignore", "pyproject.toml"]
