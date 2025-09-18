@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Python library (`fastapi-utils`) that provides common utilities for working with FastAPI applications. The project is in early development stage with minimal structure currently in place.
+This is a Python library (`fastapi-toolbox`) that provides common utilities for working with FastAPI applications. The project is in early development stage with minimal structure currently in place.
 
 ## Development Environment
 
@@ -32,6 +32,17 @@ This is a Python library (`fastapi-utils`) that provides common utilities for wo
 - **Run the main module**: `uv run python main.py`
 - **Install in development mode**: `uv pip install -e .`
 - **Create virtual environment**: `uv venv`
+
+## Publishing to PyPI
+
+1. **Build the package**: `uv build`
+2. **Upload to TestPyPI (recommended first)**: `uv publish --repository testpypi --token pypi-your-token`
+3. **Upload to PyPI**: `uv publish --token pypi-your-token`
+
+Before publishing:
+- Update author information in pyproject.toml
+- Check if package name is available on PyPI
+- Test the package locally
 
 ## Available Utilities
 
