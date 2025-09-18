@@ -4,7 +4,7 @@ import logging
 import multiprocessing
 import os
 from itertools import chain
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 import loguru
 
