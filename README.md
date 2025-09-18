@@ -1,6 +1,6 @@
 # FastAPI Toolbox
 
-这是一个Python库，提供FastAPI开发时的常用工具和功能。
+这是一个Python库，提供FastAPI开发时的常用工具和功能，包括静态文件缓存控制和高级日志系统。
 
 ## 安装
 
@@ -9,6 +9,67 @@ pip install fastapi-toolbox
 ```
 
 ## 功能特性
+
+### 日志功能
+
+`fastapi-toolbox` 提供了基于 loguru 的高级日志系统，支持多进程环境下的日志配置。
+
+#### 基本用法
+
+```python
+from fastapi import FastAPI
+from fastapi_toolbox import logger, setup_logging, UvicornConfig
+import uvicorn
+
+# 设置日志
+setup_logging()
+
+app = FastAPI()
+
+@app.get("/")
+async def read_root():
+    logger.info("Hello World访问")
+    return {"Hello": "World"}
+
+if __name__ == "__main__":
+    # 使用自定义的UvicornConfig，支持多进程日志
+    config = UvicornConfig(
+        app="main:app",
+        host="127.0.0.1",
+        port=8000,
+        workers=1
+    )
+    uvicorn.run(**config.__dict__)
+```
+
+#### 文件日志
+
+```python
+from fastapi_toolbox import add_file_log, logger
+
+# 添加文件日志，支持自动轮转
+add_file_log(
+    log_path="app.log",
+    rotation_size=10 * 1024 * 1024,  # 10MB轮转
+    rotation_time="00:00",  # 每天午夜轮转
+    retention="10 Days",  # 保留10天
+    compression="zip"  # zip压缩
+)
+
+logger.info("这条日志会同时输出到控制台和文件")
+```
+
+#### 环境变量配置
+
+- `LOG_LEVEL`: 设置日志级别（DEBUG, INFO, WARNING, ERROR），默认INFO
+- `JSON_LOGS`: 设置为"1"启用JSON格式日志，默认为标准格式
+
+#### 主要特性
+
+- **多进程支持**：`UvicornConfig` 确保多进程环境下日志正常工作
+- **自动轮转**：支持按文件大小和时间进行日志轮转
+- **统一拦截**：自动拦截标准库logging并转发到loguru
+- **灵活配置**：支持环境变量和代码配置
 
 ### StaticFilesCache
 
