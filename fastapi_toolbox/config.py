@@ -17,6 +17,11 @@ class UvicornConfig(Config):
         """
         初始化方法
         保存logger的core对象,并调用父类初始化
+
+        Args:
+            filter_callbacks: 可选的过滤回调函数列表，用于过滤日志记录。
+                            每个回调函数接收一个record参数，返回True表示过滤掉该日志。
+                            常用于过滤特定模块的日志，如SQLAlchemy的低级别日志。
         """
         # 提取callbacks参数
         self.filter_callbacks = kwargs.pop('filter_callbacks', None)
