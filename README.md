@@ -20,9 +20,7 @@ pip install fastapi-toolbox
 from fastapi import FastAPI
 from fastapi_toolbox import logger, setup_logging, UvicornConfig
 import uvicorn
-
-# 设置日志
-setup_logging()
+import logging
 
 app = FastAPI()
 
@@ -32,14 +30,39 @@ async def read_root():
     return {"Hello": "World"}
 
 if __name__ == "__main__":
-    # 使用自定义的UvicornConfig，支持多进程日志
-    config = UvicornConfig(
-        app="main:app",
-        host="127.0.0.1",
-        port=8000,
-        workers=1
-    )
-    uvicorn.run(**config.__dict__)
+    host = "127.0.0.1"
+    port = 8000
+    workers = 1
+
+    # 配置日志
+    # 重置logger，去掉默认带的sink，否则默认它带的stderr sink无法通过spawn方式传递过去，无法序列化
+    # 会报错 TypeError: cannot pickle '_io.TextIOWrapper' object
+    logger.remove()
+    # 添加文件 sink
+    _format = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}"
+    add_file_log("logs/app.log", _format=_format, workers=workers)
+
+    def filter_sqlalchemy(record):
+        if record.name.startswith("sqlalchemy"):
+            if record.levelno < logging.ERROR:
+                return True
+
+    # 创建通用配置
+    config = UvicornConfig("main:app", host=host, workers=workers, port=port, filter_callbacks=[filter_sqlalchemy])
+    # 创建服务器实例
+    server = Server(config=config)
+
+    try:
+        # 根据workers数量选择启动模式
+        if workers < 2:
+            # 单进程模式
+            server.run()
+        else:
+            # 多进程模式
+            sock = config.bind_socket()
+            Multiprocess(config, target=server.run, sockets=[sock]).run()
+    except KeyboardInterrupt:
+        pass  # pragma: full coverage modify
 ```
 
 #### 文件日志
