@@ -18,6 +18,9 @@ class UvicornConfig(Config):
         初始化方法
         保存logger的core对象,并调用父类初始化
         """
+        # 提取callbacks参数
+        self.filter_callbacks = kwargs.pop('filter_callbacks', None)
+
         # 这里core.handlers 里只有文件的handler
         self.handlers = logger._core.handlers
         super().__init__(*args, **kwargs)
@@ -38,7 +41,7 @@ class UvicornConfig(Config):
 
             logger.add(sys.stderr, level=logging.INFO)
 
-            setup_logging()
+            setup_logging(filter_callbacks=self.filter_callbacks)
         else:
             # 添加一个handler后
             # 这里loguru logger._core.handlers 会浅拷贝，生成一个新的对象
@@ -46,4 +49,4 @@ class UvicornConfig(Config):
             # 而原有的对象里只有文件的handler, 这样才能传递到子进程里 (可序列化)
             logger.add(sys.stderr, level=logging.INFO)
 
-            setup_logging()
+            setup_logging(filter_callbacks=self.filter_callbacks)

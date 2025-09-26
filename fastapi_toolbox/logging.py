@@ -33,6 +33,20 @@ def get_log_level():
 class InterceptHandler(logging.Handler):
     """拦截标准库logging的Handler，将日志转发到loguru"""
 
+    # 过滤回调列表
+    filter_callbacks = []
+
+    @classmethod
+    def add_filter_callback(cls, callback):
+        """添加过滤回调函数，回调函数接收record参数，返回True表示过滤掉该日志"""
+        cls.filter_callbacks.append(callback)
+
+    @classmethod
+    def remove_filter_callback(cls, callback):
+        """移除过滤回调函数"""
+        if callback in cls.filter_callbacks:
+            cls.filter_callbacks.remove(callback)
+
     def emit(self, record):
         # 获取对应的loguru日志级别
         try:
@@ -52,6 +66,19 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
+        # 执行所有注册的过滤回调
+        for callback in self.filter_callbacks:
+            if callback(record):
+                return
+
+        if record.name.startswith("sqlalchemy"):
+            if record.levelno < logging.ERROR:
+                return
+
+        # 过滤ASR client disconnected消息
+        if "ASR client is disconnected" in record.getMessage():
+            return
+
         # 使用loguru记录日志,传入调用深度和异常信息
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
@@ -60,8 +87,17 @@ LOG_LEVEL = get_log_level()
 JSON_LOGS = True if os.environ.get("JSON_LOGS", "0") == "1" else False
 
 
-def setup_logging():
-    """设置日志配置，拦截所有标准logging的日志并转发到loguru"""
+def setup_logging(filter_callbacks=None):
+    """设置日志配置，拦截所有标准logging的日志并转发到loguru
+
+    Args:
+        filter_callbacks: 过滤回调函数列表，每个回调接收record参数，返回True表示过滤掉该日志
+    """
+    # 注册过滤回调
+    if filter_callbacks:
+        for callback in filter_callbacks:
+            InterceptHandler.add_filter_callback(callback)
+
     # 设置根日志记录器的处理器，包括拦截器和流处理器
     logging.root.handlers = [InterceptHandler()]
     # 设置根日志记录器的日志级别
