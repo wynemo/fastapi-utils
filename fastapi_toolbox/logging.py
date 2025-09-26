@@ -4,7 +4,7 @@ import logging
 import multiprocessing
 import os
 from itertools import chain
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import loguru
 
@@ -70,14 +70,6 @@ class InterceptHandler(logging.Handler):
         for callback in self.filter_callbacks:
             if callback(record):
                 return
-
-        if record.name.startswith("sqlalchemy"):
-            if record.levelno < logging.ERROR:
-                return
-
-        # 过滤ASR client disconnected消息
-        if "ASR client is disconnected" in record.getMessage():
-            return
 
         # 使用loguru记录日志,传入调用深度和异常信息
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
