@@ -14,6 +14,7 @@ from .logging import (
     LOG_LEVEL,
     JSON_LOGS
 )
+from .server import run_server
 
 __all__ = [
     "StaticFilesCache",
@@ -25,5 +26,6 @@ __all__ = [
     "Rotator",
     "get_log_level",
     "LOG_LEVEL",
-    "JSON_LOGS"
+    "JSON_LOGS",
+    "run_server"
 ]
