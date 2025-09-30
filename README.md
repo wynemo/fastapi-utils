@@ -14,7 +14,7 @@ pip install fastapi-toolbox
 
 ## 功能特性
 
-### 日志功能
+### 运行服务器
 
 `fastapi-toolbox` 提供了基于 loguru 的高级日志系统，支持多进程环境下的日志配置。
 
@@ -22,7 +22,7 @@ pip install fastapi-toolbox
 
 ```python
 from fastapi import FastAPI
-from fastapi_toolbox import logger, setup_logging, UvicornConfig
+from fastapi_toolbox import logger, run_server
 import uvicorn
 import logging
 
@@ -34,7 +34,6 @@ async def read_root():
     return {"Hello": "World"}
 
 if __name__ == "__main__":
-    from fastapi_toolbox import run_server
 
     def filter_sqlalchemy(record):
         if record.name.startswith("sqlalchemy"):
@@ -46,27 +45,11 @@ if __name__ == "__main__":
         host="127.0.0.1",
         port=8000,
         workers=1,
-        log_file="logs/app.log",
+        log_file="logs/app.log", # 日志轮转
         filter_callbacks=[filter_sqlalchemy]
     )
 ```
 
-#### 文件日志
-
-```python
-from fastapi_toolbox import add_file_log, logger
-
-# 添加文件日志，支持自动轮转
-add_file_log(
-    log_path="app.log",
-    rotation_size=10 * 1024 * 1024,  # 10MB轮转
-    rotation_time="00:00",  # 每天午夜轮转
-    retention="10 Days",  # 保留10天
-    compression="zip"  # zip压缩
-)
-
-logger.info("这条日志会同时输出到控制台和文件")
-```
 
 #### 环境变量配置
 
