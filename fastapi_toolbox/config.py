@@ -1,11 +1,10 @@
-import logging
 import sys
-from typing import Optional
 
 from uvicorn import Config
 
-from .logging import logger, setup_logging
+from .logging import get_log_level, logger, setup_logging
 
+LOG_LEVEL = get_log_level()
 
 class UvicornConfig(Config):
     """
@@ -44,7 +43,7 @@ class UvicornConfig(Config):
             # 子进程里 会进入这里， 使用父进程传递进来的core对象
             logger._core.handlers = self.handlers
 
-            logger.add(sys.stderr, level=logging.INFO)
+            logger.add(sys.stderr, level=LOG_LEVEL)
 
             setup_logging(filter_callbacks=self.filter_callbacks)
         else:
@@ -52,6 +51,6 @@ class UvicornConfig(Config):
             # 这里loguru logger._core.handlers 会浅拷贝，生成一个新的对象
             # self.handlers 还是引用的原有的对像
             # 而原有的对象里只有文件的handler, 这样才能传递到子进程里 (可序列化)
-            logger.add(sys.stderr, level=logging.INFO)
+            logger.add(sys.stderr, level=LOG_LEVEL)
 
             setup_logging(filter_callbacks=self.filter_callbacks)
