@@ -147,7 +147,7 @@ class Rotator:
 
 def add_file_log(
     log_path: str,
-    _format: Optional[str] = None,
+    _format: Optional[str] = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
     patcher: Optional[Any] = None,
     workers: int = 1,
     rotation_size: int = 10 * 1024 * 1024,  # 默认10MB
