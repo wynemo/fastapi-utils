@@ -20,6 +20,10 @@ def run_server(
     log_file: Optional[str] = None,
     log_format: Optional[str] = None,
     filter_callbacks: Optional[List[Callable]] = None,
+    rotation_size: int = 10 * 1024 * 1024,  # 默认10MB
+    rotation_time: str = "00:00",  # 默认午夜轮转
+    retention: str = "10 Days",  # 默认保留10天
+    compression: str = "zip",  # 默认使用zip压缩
     **uvicorn_kwargs
 ):
     """
@@ -33,6 +37,10 @@ def run_server(
         log_file: 日志文件路径，如 "logs/app.log"，None表示不记录到文件
         log_format: 日志格式，默认 "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}"
         filter_callbacks: 日志过滤回调函数列表，每个回调接收record参数，返回True表示过滤掉该日志
+        rotation_size: 文件大小限制（字节），默认10MB
+        rotation_time: 每天轮转的时间点，格式"HH:MM"，默认"00:00"
+        retention: 日志保留时间，默认"10 Days"
+        compression: 日志压缩格式，默认"zip"
         **uvicorn_kwargs: 其他uvicorn配置参数
 
     Example:
@@ -66,7 +74,15 @@ def run_server(
     if log_file:
         if log_format is None:
             log_format = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}"
-        add_file_log(log_file, _format=log_format, workers=workers)
+        add_file_log(
+            log_file,
+            _format=log_format,
+            workers=workers,
+            rotation_size=rotation_size,
+            rotation_time=rotation_time,
+            retention=retention,
+            compression=compression
+        )
 
     # 创建uvicorn配置
     config = UvicornConfig(
