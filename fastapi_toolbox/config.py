@@ -1,3 +1,4 @@
+import copy
 import sys
 
 from uvicorn import Config
@@ -26,7 +27,8 @@ class UvicornConfig(Config):
         self.filter_callbacks = kwargs.pop('filter_callbacks', None)
 
         # 这里core.handlers 里只有文件的handler
-        self.handlers = logger._core.handlers
+        # 1. 字典的浅拷贝
+        self._core = copy.copy(logger._core)
         super().__init__(*args, **kwargs)
 
     def configure_logging(self) -> None:
@@ -38,18 +40,18 @@ class UvicornConfig(Config):
         """
 
         super().configure_logging()
-        if logger._core.handlers is not self.handlers:
-            # 父进程里 不会进入这里
+        if logger._core.handlers is not self._core.handlers:
+            # 3. 父进程里 不会进入这里
             # 子进程里 会进入这里， 使用父进程传递进来的core对象
-            logger._core.handlers = self.handlers
+            logger._core= self._core
 
             logger.add(sys.stderr, level=LOG_LEVEL)
 
             setup_logging(filter_callbacks=self.filter_callbacks)
         else:
-            # 添加一个handler后
+            # 2. 添加一个handler后
             # 这里loguru logger._core.handlers 会浅拷贝，生成一个新的对象
-            # self.handlers 还是引用的原有的对像
+            # self._core.handlers 还是引用的原有的对像
             # 而原有的对象里只有文件的handler, 这样才能传递到子进程里 (可序列化)
             logger.add(sys.stderr, level=LOG_LEVEL)
 
