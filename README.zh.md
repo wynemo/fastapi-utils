@@ -129,6 +129,72 @@ app.mount("/", StaticFilesCache(directory=front_folder), name="static")
 
 这样配置后，HTML文件将不会被浏览器缓存，确保用户总是获取最新版本的前端应用。
 
+### NextJSRouteMiddleware
+
+`NextJSRouteMiddleware` 是一个处理 Next.js 静态导出路由的中间件。当请求返回 404 时，它会尝试查找对应的 `.html` 文件。
+
+#### 基本用法
+
+```python
+from fastapi import FastAPI
+from fastapi_toolbox import NextJSRouteMiddleware
+
+app = FastAPI()
+
+# 添加中间件
+app.add_middleware(
+    NextJSRouteMiddleware,
+    static_dir="frontend/dist",
+    skip_prefixes=["/api", "/static", "/docs", "/openapi.json", "/redoc"],
+)
+```
+
+#### 参数说明
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `static_dir` | 静态文件目录路径 | 必填 |
+| `skip_prefixes` | 要跳过处理的路径前缀列表 | `[]` |
+| `index_file` | 根路径的默认文件名（不带扩展名） | `"index"` |
+
+#### 工作原理
+
+1. 匹配 `skip_prefixes` 的请求直接通过
+2. 其他请求正常处理
+3. 如果返回 404 且路径不以 `/_next` 开头，则查找对应的 `.html` 文件
+4. 例如：`/about` → 查找 `frontend/dist/about.html`
+5. 根路径 `/` → 查找 `frontend/dist/index.html`
+
+#### 实际应用示例
+
+```python
+from fastapi import FastAPI
+from fastapi_toolbox import NextJSRouteMiddleware, StaticFilesCache
+import os
+
+app = FastAPI()
+
+front_folder = os.path.join(os.path.dirname(__file__), "frontend/dist")
+
+# 添加 Next.js 路由中间件
+app.add_middleware(
+    NextJSRouteMiddleware,
+    static_dir=front_folder,
+    skip_prefixes=[
+        "/api",
+        "/static",
+        "/_next",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
+        "/favicon.ico",
+    ],
+)
+
+# 挂载静态文件
+app.mount("/", StaticFilesCache(directory=front_folder), name="static")
+```
+
 ## 构建
 
 uv build
