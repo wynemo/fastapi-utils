@@ -3,6 +3,8 @@ Middleware utilities for FastAPI
 """
 
 import os
+from typing import List, Optional
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import FileResponse
 from starlette.requests import Request
@@ -19,7 +21,7 @@ class NextJSRouteMiddleware(BaseHTTPMiddleware):
         self,
         app,
         static_dir: str,
-        skip_prefixes: list[str] | None = None,
+        skip_prefixes: Optional[List[str]] = None,
         index_file: str = "index",
     ):
         """
