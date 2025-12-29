@@ -15,6 +15,7 @@ from .logging import (
     JSON_LOGS
 )
 from .server import run_server
+from .middleware import NextJSRouteMiddleware
 
 __all__ = [
     "StaticFilesCache",
@@ -27,5 +28,6 @@ __all__ = [
     "get_log_level",
     "LOG_LEVEL",
     "JSON_LOGS",
-    "run_server"
+    "run_server",
+    "NextJSRouteMiddleware"
 ]

@@ -131,6 +131,72 @@ app.mount("/", StaticFilesCache(directory=front_folder), name="static")
 
 With this configuration, HTML files will not be cached by the browser, ensuring users always get the latest version of the frontend application.
 
+### NextJSRouteMiddleware
+
+`NextJSRouteMiddleware` is a middleware for handling Next.js static export routes. When a request returns 404, it attempts to find the corresponding `.html` file.
+
+#### Basic Usage
+
+```python
+from fastapi import FastAPI
+from fastapi_toolbox import NextJSRouteMiddleware
+
+app = FastAPI()
+
+# Add middleware
+app.add_middleware(
+    NextJSRouteMiddleware,
+    static_dir="frontend/dist",
+    skip_prefixes=["/api", "/static", "/docs", "/openapi.json", "/redoc"],
+)
+```
+
+#### Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `static_dir` | Static files directory path | Required |
+| `skip_prefixes` | List of path prefixes to skip processing | `[]` |
+| `index_file` | Default filename for root path (without extension) | `"index"` |
+
+#### How It Works
+
+1. Requests matching `skip_prefixes` are passed through directly
+2. Other requests are processed normally
+3. If 404 is returned and path doesn't start with `/_next`, it looks for the corresponding `.html` file
+4. For example: `/about` → looks for `frontend/dist/about.html`
+5. Root path `/` → looks for `frontend/dist/index.html`
+
+#### Practical Example
+
+```python
+from fastapi import FastAPI
+from fastapi_toolbox import NextJSRouteMiddleware, StaticFilesCache
+import os
+
+app = FastAPI()
+
+front_folder = os.path.join(os.path.dirname(__file__), "frontend/dist")
+
+# Add Next.js route middleware
+app.add_middleware(
+    NextJSRouteMiddleware,
+    static_dir=front_folder,
+    skip_prefixes=[
+        "/api",
+        "/static",
+        "/_next",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
+        "/favicon.ico",
+    ],
+)
+
+# Mount static files
+app.mount("/", StaticFilesCache(directory=front_folder), name="static")
+```
+
 ## Build
 
 uv build
