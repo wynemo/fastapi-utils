@@ -48,7 +48,8 @@ if __name__ == "__main__":
         port=8000,
         workers=1,
         log_file="logs/app.log", # Log rotation
-        filter_callbacks=[filter_sqlalchemy]
+        filter_callbacks=[filter_sqlalchemy],
+        reload=True  # Enable hot reload (development only)
     )
 ```
 
