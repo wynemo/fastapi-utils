@@ -3,7 +3,7 @@ import sys
 
 from uvicorn import Config
 
-from .logging import get_log_level, logger, setup_logging
+from .logging import get_log_level, logger, setup_logging, add_file_log
 
 LOG_LEVEL = get_log_level()
 
@@ -26,9 +26,21 @@ class UvicornConfig(Config):
         # 提取callbacks参数
         self.filter_callbacks = kwargs.pop('filter_callbacks', None)
 
-        # 这里core.handlers 里只有文件的handler
-        # 1. 字典的浅拷贝
-        self._core = copy.copy(logger._core)
+        self.log_file = kwargs.pop("log_file", None)
+        self.log_format = kwargs.pop("_format", None)
+        self.rotation_size = kwargs.pop("rotation_size", None)
+        self.rotation_time = kwargs.pop("rotation_time", None)
+        self.retention = kwargs.pop("retention", None)
+        self.compression = kwargs.pop("compression", None)
+        if kwargs.get("reload", False):
+            self.is_reload = True
+            self._core = None
+        else:
+            self.is_reload = False
+            # 这里core.handlers 里只有文件的handler
+            # 1. 字典的浅拷贝
+            self._core = copy.copy(logger._core)
+
         super().__init__(*args, **kwargs)
 
     def configure_logging(self) -> None:
@@ -38,6 +50,24 @@ class UvicornConfig(Config):
         确保子进程logger使用父进程传递过来的core对象
         设置日志配置
         """
+        if self.is_reload:
+            if not logger._core.handlers:
+                # parent, reload
+                logger.add(sys.stderr, level=LOG_LEVEL)
+                setup_logging(filter_callbacks=self.filter_callbacks)
+            else:
+                # child, reload
+                setup_logging(filter_callbacks=self.filter_callbacks)
+
+                add_file_log(
+                    self.log_file,
+                    _format=self.log_format,
+                    rotation_size=self.rotation_size,
+                    rotation_time=self.rotation_time,
+                    retention=self.retention,
+                    compression=self.compression,
+                )
+            return
 
         super().configure_logging()
         if logger._core.handlers is not self._core.handlers:

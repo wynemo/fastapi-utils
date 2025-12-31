@@ -70,10 +70,12 @@ def run_server(
     # 会报错 TypeError: cannot pickle '_io.TextIOWrapper' object
     logger.remove()
 
+    if log_format is None:
+        log_format = "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}"
+
     # 添加文件日志（如果指定了日志文件路径）
-    if log_file:
-        if log_format is None:
-            log_format = "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}"
+    is_reload = uvicorn_kwargs.get("reload", None)
+    if not is_reload and log_file:
         add_file_log(
             log_file,
             _format=log_format,
@@ -91,6 +93,12 @@ def run_server(
         port=port,
         workers=workers,
         filter_callbacks=filter_callbacks,
+        log_file=log_file,
+        _format=log_format,
+        rotation_size=rotation_size,
+        rotation_time=rotation_time,
+        retention=retention,
+        compression=compression,
         **uvicorn_kwargs
     )
 
