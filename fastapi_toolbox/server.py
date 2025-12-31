@@ -35,7 +35,7 @@ def run_server(
         port: 监听端口，默认 8000
         workers: 工作进程数，大于1时使用多进程模式，默认 1
         log_file: 日志文件路径，如 "logs/app.log"，None表示不记录到文件
-        log_format: 日志格式，默认 "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}"
+        log_format: 日志格式，默认 "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}"
         filter_callbacks: 日志过滤回调函数列表，每个回调接收record参数，返回True表示过滤掉该日志
         rotation_size: 文件大小限制（字节），默认10MB
         rotation_time: 每天轮转的时间点，格式"HH:MM"，默认"00:00"
@@ -73,7 +73,7 @@ def run_server(
     # 添加文件日志（如果指定了日志文件路径）
     if log_file:
         if log_format is None:
-            log_format = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}"
+            log_format = "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}"
         add_file_log(
             log_file,
             _format=log_format,
