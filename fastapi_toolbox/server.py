@@ -6,7 +6,7 @@ import logging
 from typing import Optional, List, Callable
 
 from uvicorn import Server
-from uvicorn.supervisors import Multiprocess
+from uvicorn.supervisors import ChangeReload, Multiprocess
 
 from .config import UvicornConfig
 from .logging import logger, add_file_log
@@ -106,8 +106,11 @@ def run_server(
     server = Server(config=config)
 
     try:
+        if config.should_reload:
+            sock = config.bind_socket()
+            ChangeReload(config, target=server.run, sockets=[sock]).run()
         # 根据workers数量选择启动模式
-        if workers < 2:
+        elif workers < 2:
             # 单进程模式
             server.run()
         else:
