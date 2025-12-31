@@ -54,6 +54,25 @@ if __name__ == "__main__":
 ```
 
 
+#### Hot Reload Mode
+
+The `reload` parameter enables automatic server restart when code changes are detected. This is useful during development:
+
+```python
+run_server(
+    "main:app",
+    host="127.0.0.1",
+    port=8000,
+    reload=True,  # Enable hot reload
+    reload_dirs=["src"],  # Optional: specify directories to watch
+)
+```
+
+**Note**:
+- Hot reload mode uses `fork` internally, which differs from multi-process mode (`workers >= 2`) that uses `spawn`
+- File logging behaves differently in reload mode to avoid multiple processes writing to the same file
+- **Do not use `reload=True` in production**
+
 #### Environment Variable Configuration
 
 - `LOG_LEVEL`: Set log level (DEBUG, INFO, WARNING, ERROR), defaults to INFO
