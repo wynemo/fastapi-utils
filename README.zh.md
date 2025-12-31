@@ -1,5 +1,7 @@
 # FastAPI Toolbox
 
+中文文档 | [English](README.md)
+
 这是一个Python库，提供FastAPI开发时的常用工具和功能，包括静态文件缓存控制和高级日志系统。
 
 ## 安装
