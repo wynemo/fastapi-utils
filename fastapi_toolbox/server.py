@@ -107,6 +107,7 @@ def run_server(
 
     try:
         if config.should_reload:
+            # fork
             sock = config.bind_socket()
             ChangeReload(config, target=server.run, sockets=[sock]).run()
         # 根据workers数量选择启动模式
@@ -114,7 +115,7 @@ def run_server(
             # 单进程模式
             server.run()
         else:
-            # 多进程模式
+            # 多进程模式, spawn
             sock = config.bind_socket()
             Multiprocess(config, target=server.run, sockets=[sock]).run()
     except KeyboardInterrupt:

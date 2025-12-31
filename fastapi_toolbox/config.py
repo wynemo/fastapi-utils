@@ -34,7 +34,7 @@ class UvicornConfig(Config):
         self.compression = kwargs.pop("compression", None)
         if kwargs.get("reload", False):
             self.is_reload = True
-            self._core = None
+            self._core = None  # reload uses fork, can't pass core to child
         else:
             self.is_reload = False
             # 这里core.handlers 里只有文件的handler
@@ -51,14 +51,15 @@ class UvicornConfig(Config):
         设置日志配置
         """
         if self.is_reload:
+            # reload mode
             if not logger._core.handlers:
-                # parent, reload
+                # parent
                 logger.add(sys.stderr, level=LOG_LEVEL)
                 setup_logging(filter_callbacks=self.filter_callbacks)
             else:
-                # child, reload
+                # child
                 setup_logging(filter_callbacks=self.filter_callbacks)
-
+                # add file log in child process
                 add_file_log(
                     self.log_file,
                     _format=self.log_format,
