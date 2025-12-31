@@ -14,6 +14,16 @@ uv add fastapi-toolbox
 pip install fastapi-toolbox
 ```
 
+或者直接从 GitHub 安装：
+
+```bash
+uv add git+https://github.com/wynemo/fastapi-utils.git
+```
+
+```bash
+pip install git+https://github.com/wynemo/fastapi-utils.git
+```
+
 ## 功能特性
 
 ### 运行服务器
