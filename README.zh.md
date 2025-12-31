@@ -48,10 +48,30 @@ if __name__ == "__main__":
         port=8000,
         workers=1,
         log_file="logs/app.log", # 日志轮转
-        filter_callbacks=[filter_sqlalchemy]
+        filter_callbacks=[filter_sqlalchemy],
+        reload=True  # 启用热重载（仅开发环境）
     )
 ```
 
+
+#### 热重载模式
+
+`reload` 参数可以在检测到代码变更时自动重启服务器。这在开发过程中非常有用：
+
+```python
+run_server(
+    "main:app",
+    host="127.0.0.1",
+    port=8000,
+    reload=True,  # 启用热重载
+    reload_dirs=["src"],  # 可选：指定要监视的目录
+)
+```
+
+**注意**：
+- 热重载模式内部使用 `fork`，这与多进程模式（`workers >= 2`）使用 `spawn` 不同
+- 文件日志在重载模式下的行为有所不同，以避免多个进程写入同一文件
+- **请勿在生产环境使用 `reload=True`**
 
 #### 环境变量配置
 
