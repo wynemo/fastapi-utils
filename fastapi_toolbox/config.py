@@ -10,7 +10,8 @@ LOG_LEVEL = get_log_level()
 class UvicornConfig(Config):
     """
     自定义配置类,继承自uvicorn的Config类
-    uvicorn 用的spawn，需要通过config把logger._core 传递到子进程里
+    非reload模式下,uvicorn使用spawn启动子进程,需要通过config把logger._core传递到子进程里
+    reload模式下,使用fork启动子进程,可以直接继承父进程的logger配置
     """
 
     def __init__(self, *args, **kwargs):
