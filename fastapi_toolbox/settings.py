@@ -1,5 +1,4 @@
-from typing import Optional
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -20,12 +19,10 @@ class Settings(BaseSettings):
         ```
     """
 
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
     # 数据库配置
     DATABASE_URL: str = "postgresql://user:password@localhost:5432/db"
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
 
 
 # 默认配置实例，会自动从环境变量或 .env 文件加载
