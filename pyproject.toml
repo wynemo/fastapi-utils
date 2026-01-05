@@ -35,6 +35,11 @@ classifiers = [
 ]
 keywords = ["fastapi", "starlette", "web", "utilities"]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/wynemo/fastapi-utils"
 Repository = "https://github.com/wynemo/fastapi-utils.git"
