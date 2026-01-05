@@ -14,7 +14,6 @@ class Settings(BaseSettings):
 
         class MySettings(Settings):
             DATABASE_URL: str = "postgresql://user:pass@prod:5432/prod_db"
-            JWT_SECRET_KEY: str = "my-production-secret"
 
         my_settings = MySettings()
         init_database(settings_instance=my_settings)
@@ -23,11 +22,6 @@ class Settings(BaseSettings):
 
     # 数据库配置
     DATABASE_URL: str = "postgresql://user:password@localhost:5432/db"
-
-    # JWT 配置
-    JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
-    JWT_ALGORITHM: str = "HS256"
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
 
     class Config:
         env_file = ".env"
