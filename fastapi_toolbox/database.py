@@ -1,5 +1,6 @@
 from typing import Optional, Generator, Any
-from sqlmodel import Session, SQLModel, create_engine, Engine
+from sqlalchemy.engine import Engine
+from sqlmodel import Session, SQLModel, create_engine
 
 from .settings import settings, Settings
 
