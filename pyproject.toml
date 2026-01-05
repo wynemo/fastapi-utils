@@ -13,6 +13,8 @@ dependencies = [
     "loguru",
     "starlette",
     "uvicorn",
+    "pydantic-settings",
+    "sqlmodel",
 ]
 authors = [
     {name = "wynemo", email = "ggdabin@gmail.com"}
