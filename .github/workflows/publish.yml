@@ -11,7 +11,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: github.event.inputs.confirm == 'publish'
+    if: github.ref == 'refs/heads/main' && github.event.inputs.confirm == 'publish'
 
     steps:
     - uses: actions/checkout@v4
