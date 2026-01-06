@@ -227,6 +227,106 @@ app.add_middleware(
 app.mount("/", StaticFilesCache(directory=front_folder), name="static")
 ```
 
+### Settings（配置管理）
+
+`Settings` 是基于 pydantic-settings 的配置类，支持从环境变量或 `.env` 文件加载配置。
+
+#### 基本用法
+
+```python
+from fastapi_toolbox import Settings, settings
+
+# 使用默认的 settings 实例（自动从环境变量或 .env 加载）
+print(settings.DATABASE_URL)
+
+# 或者创建自定义的 Settings 类
+class MySettings(Settings):
+    DATABASE_URL: str = "postgresql://user:pass@localhost:5432/mydb"
+    API_KEY: str = "default-key"
+
+my_settings = MySettings()
+```
+
+#### 主要特性
+
+- **环境变量支持**：自动从环境变量加载配置
+- **.env 文件支持**：自动读取 `.env` 文件
+- **便于继承**：轻松扩展自定义配置字段
+- **类型安全**：完整的 Pydantic 验证和类型检查
+
+### Database（数据库）
+
+`fastapi-toolbox` 提供了一套基于 SQLModel 的数据库工具，便于在 FastAPI 应用中集成数据库。
+
+#### 基本用法
+
+```python
+from fastapi import FastAPI, Depends
+from fastapi_toolbox import init_database, get_session, create_db_and_tables
+from sqlmodel import Session, SQLModel, Field
+
+app = FastAPI()
+
+# 定义模型
+class User(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    name: str
+    email: str
+
+# 应用启动时初始化数据库
+@app.on_event("startup")
+def on_startup():
+    init_database(database_url="sqlite:///./test.db")
+    create_db_and_tables()
+
+# 使用依赖注入获取数据库会话
+@app.get("/users")
+def get_users(session: Session = Depends(get_session)):
+    return session.exec(select(User)).all()
+
+@app.post("/users")
+def create_user(user: User, session: Session = Depends(get_session)):
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
+```
+
+#### 配置方式
+
+`init_database` 支持三种配置方式（按优先级从高到低）：
+
+```python
+from fastapi_toolbox import Settings, init_database
+
+# 方式 1：直接传入 database_url
+init_database(
+    database_url="postgresql://user:pass@localhost:5432/mydb",
+    echo=True,  # 启用 SQL 日志
+    pool_size=10
+)
+
+# 方式 2：使用自定义 Settings 实例
+class MySettings(Settings):
+    DATABASE_URL: str = "postgresql://user:pass@prod:5432/prod_db"
+
+my_settings = MySettings()
+init_database(settings_instance=my_settings)
+
+# 方式 3：使用默认配置（从 .env 或环境变量读取）
+# 在 .env 或环境变量中设置 DATABASE_URL
+init_database()
+```
+
+#### 可用函数
+
+| 函数 | 说明 |
+|------|------|
+| `init_database()` | 初始化数据库引擎，支持灵活的配置选项 |
+| `get_engine()` | 获取数据库引擎实例（如需要会自动初始化） |
+| `get_session()` | 用于依赖注入的数据库会话函数 |
+| `create_db_and_tables()` | 根据 SQLModel 模型创建所有表 |
+
 ## 构建
 
 uv build
