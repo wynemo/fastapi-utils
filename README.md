@@ -227,6 +227,106 @@ app.add_middleware(
 app.mount("/", StaticFilesCache(directory=front_folder), name="static")
 ```
 
+### Settings
+
+`Settings` is a configuration class based on pydantic-settings that supports loading configuration from environment variables or `.env` files.
+
+#### Basic Usage
+
+```python
+from fastapi_toolbox import Settings, settings
+
+# Use the default settings instance (automatically loads from environment variables or .env)
+print(settings.DATABASE_URL)
+
+# Or create a custom Settings class
+class MySettings(Settings):
+    DATABASE_URL: str = "postgresql://user:pass@localhost:5432/mydb"
+    API_KEY: str = "default-key"
+
+my_settings = MySettings()
+```
+
+#### Key Features
+
+- **Environment Variable Support**: Automatically loads from environment variables
+- **.env File Support**: Automatically reads `.env` files
+- **Inheritance Friendly**: Easily extend with custom configuration fields
+- **Type Safe**: Full Pydantic validation and type checking
+
+### Database
+
+`fastapi-toolbox` provides a set of database utilities based on SQLModel, making it easy to integrate databases into your FastAPI application.
+
+#### Basic Usage
+
+```python
+from fastapi import FastAPI, Depends
+from fastapi_toolbox import init_database, get_session, create_db_and_tables
+from sqlmodel import Session, SQLModel, Field
+
+app = FastAPI()
+
+# Define your models
+class User(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    name: str
+    email: str
+
+# Initialize database on startup
+@app.on_event("startup")
+def on_startup():
+    init_database(database_url="sqlite:///./test.db")
+    create_db_and_tables()
+
+# Use dependency injection to get database sessions
+@app.get("/users")
+def get_users(session: Session = Depends(get_session)):
+    return session.exec(select(User)).all()
+
+@app.post("/users")
+def create_user(user: User, session: Session = Depends(get_session)):
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
+```
+
+#### Configuration Methods
+
+`init_database` supports three configuration methods (in order of priority):
+
+```python
+from fastapi_toolbox import Settings, init_database
+
+# Method 1: Pass database_url directly
+init_database(
+    database_url="postgresql://user:pass@localhost:5432/mydb",
+    echo=True,  # Enable SQL logging
+    pool_size=10
+)
+
+# Method 2: Use custom Settings instance
+class MySettings(Settings):
+    DATABASE_URL: str = "postgresql://user:pass@prod:5432/prod_db"
+
+my_settings = MySettings()
+init_database(settings_instance=my_settings)
+
+# Method 3: Use default settings (reads from .env or environment variables)
+# Set DATABASE_URL in .env or environment
+init_database()
+```
+
+#### Available Functions
+
+| Function | Description |
+|----------|-------------|
+| `init_database()` | Initialize database engine with flexible configuration options |
+| `get_engine()` | Get the database engine instance (auto-initializes if needed) |
+| `get_session()` | Dependency injection function for database sessions |
+| `create_db_and_tables()` | Create all tables based on SQLModel models |
+
 ## Build
 
 uv build
