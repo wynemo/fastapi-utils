@@ -2,7 +2,7 @@ from typing import Optional, Generator, Any
 from sqlalchemy.engine import Engine
 from sqlmodel import Session, SQLModel, create_engine
 
-from .settings import settings, Settings
+from .settings import Settings
 
 # 全局 engine 实例
 _engine: Optional[Engine] = None
@@ -59,7 +59,7 @@ def init_database(
     elif settings_instance:
         url = settings_instance.DATABASE_URL
     else:
-        url = settings.DATABASE_URL
+        url = Settings().DATABASE_URL
 
     _engine = create_engine(url, **engine_kwargs)
     return _engine

@@ -16,7 +16,7 @@ from .logging import (
 )
 from .server import run_server
 from .middleware import NextJSRouteMiddleware
-from .settings import Settings, settings
+from .settings import Settings
 from .database import (
     init_database,
     get_engine,
@@ -38,7 +38,6 @@ __all__ = [
     "run_server",
     "NextJSRouteMiddleware",
     "Settings",
-    "settings",
     "init_database",
     "get_engine",
     "get_session",

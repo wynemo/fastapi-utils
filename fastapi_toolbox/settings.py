@@ -23,7 +23,3 @@ class Settings(BaseSettings):
 
     # 数据库配置
     DATABASE_URL: str = "postgresql://user:password@localhost:5432/db"
-
-
-# 默认配置实例，会自动从环境变量或 .env 文件加载
-settings = Settings()

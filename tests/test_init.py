@@ -49,11 +49,10 @@ class TestPackageImports:
         assert NextJSRouteMiddleware is not None
 
     def test_import_settings(self):
-        """Test Settings and settings can be imported"""
-        from fastapi_toolbox import Settings, settings
+        """Test Settings can be imported"""
+        from fastapi_toolbox import Settings
 
         assert Settings is not None
-        assert settings is not None
 
     def test_import_database_components(self):
         """Test database components can be imported"""
@@ -91,7 +90,6 @@ class TestAllExports:
             "run_server",
             "NextJSRouteMiddleware",
             "Settings",
-            "settings",
             "init_database",
             "get_engine",
             "get_session",
@@ -106,4 +104,4 @@ class TestAllExports:
         import fastapi_toolbox
 
         assert hasattr(fastapi_toolbox, '__all__')
-        assert len(fastapi_toolbox.__all__) == 18
+        assert len(fastapi_toolbox.__all__) == 17

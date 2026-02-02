@@ -47,19 +47,3 @@ class TestSettings:
         with patch.dict(os.environ, {"DATABASE_URL": env_url}, clear=True):
             custom_settings = CustomSettings(_env_file=None)
             assert custom_settings.DATABASE_URL == env_url
-
-
-class TestDefaultSettingsInstance:
-    """Tests for the default settings instance"""
-
-    def test_settings_instance_exists(self):
-        """Test that a default settings instance is exported"""
-        from fastapi_toolbox.settings import settings
-
-        assert settings is not None
-
-    def test_settings_instance_type(self):
-        """Test that the default settings instance is of correct type"""
-        from fastapi_toolbox.settings import settings, Settings
-
-        assert isinstance(settings, Settings)
