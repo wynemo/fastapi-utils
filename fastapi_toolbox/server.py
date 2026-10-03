@@ -2,7 +2,7 @@
 """
 FastAPI服务器启动工具
 """
-import logging
+import inspect
 from typing import Optional, List, Callable
 
 from uvicorn import Server
@@ -117,6 +117,10 @@ def run_server(
         else:
             # 多进程模式, spawn
             sock = config.bind_socket()
-            Multiprocess(config, target=server.run, sockets=[sock]).run()
+            # 新版由 Multiprocess 在子进程创建 Server，旧版仍需传入 target。
+            supervisor_kwargs = {"sockets": [sock]}
+            if "target" in inspect.signature(Multiprocess).parameters:
+                supervisor_kwargs["target"] = server.run
+            Multiprocess(config, **supervisor_kwargs).run()
     except KeyboardInterrupt:
         pass
