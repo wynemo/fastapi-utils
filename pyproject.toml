@@ -46,5 +46,5 @@ Repository = "https://github.com/wynemo/fastapi-utils.git"
 Issues = "https://github.com/wynemo/fastapi-utils/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
+packages = ["fastapi_toolbox"]
 exclude = ["CLAUDE.md", ".python-version", ".gitignore", "pyproject.toml", "README.md"]
